@@ -147,7 +147,32 @@ exports.updateNote = async (req, res) => {
   }
 };
 
-// 7. DELETE
+// 7. BULK DELETE
+exports.deleteNotesBulk = async (req, res) => {
+  try {
+    const { ids } = req.body;
+
+    if (!ids || !ids.length) {
+      return res.status(400).json({
+        success: false,
+        message: "IDs array required",
+        data: null,
+      });
+    }
+
+    const result = await Note.deleteMany({ _id: { $in: ids } });
+
+    res.json({
+      success: true,
+      message: `${result.deletedCount} notes deleted successfully`,
+      data: null,
+    });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message, data: null });
+  }
+};
+
+// 8. DELETE
 exports.deleteNote = async (req, res) => {
   try {
     const { id } = req.params;
