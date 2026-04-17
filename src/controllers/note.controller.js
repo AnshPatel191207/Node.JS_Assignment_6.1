@@ -114,3 +114,35 @@ exports.replaceNote = async (req, res) => {
     res.status(500).json({ success: false, message: err.message, data: null });
   }
 };
+
+// 6. PATCH
+exports.updateNote = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    if (!Object.keys(req.body).length) {
+      return res.status(400).json({
+        success: false,
+        message: "No fields provided to update",
+        data: null,
+      });
+    }
+
+    if (!isValidId(id)) {
+      return res.status(400).json({ success: false, message: "Invalid ID", data: null });
+    }
+
+    const note = await Note.findByIdAndUpdate(id, req.body, {
+      new: true,
+      runValidators: true,
+    });
+
+    if (!note) {
+      return res.status(404).json({ success: false, message: "Note not found", data: null });
+    }
+
+    res.json({ success: true, message: "Note updated successfully", data: note });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message, data: null });
+  }
+};
